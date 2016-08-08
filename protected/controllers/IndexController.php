@@ -474,7 +474,7 @@ class IndexController extends RISBaseController
             $this->render("suche");
         }
     }
-    
+
     /**
      * @param int $id
      */
@@ -579,8 +579,6 @@ class IndexController extends RISBaseController
     public function actionBa($ba_nr, $datum_max = "")
     {
         $this->top_menu = "ba";
-
-        $this->load_leaflet = true;
 
         $tage_zukunft       = 60;
         $tage_vergangenheit = 60;
@@ -714,8 +712,6 @@ class IndexController extends RISBaseController
         $this->top_menu = "stadtrat";
         $this->performLoginActions();
 
-        $this->load_leaflet = true;
-
         if (preg_match("/^[0-9]{4}\-[0-9]{2}\-[0-9]{2}$/siu", $datum_max)) {
             $ts = RISTools::date_iso2timestamp($datum_max);
             list($antraege, $antraege_stadtrat, $antraege_sonstige, $rus, $datum_von, $datum_bis) = $this->getStadtratsDokumenteByDate($ts);
@@ -805,7 +801,6 @@ class IndexController extends RISBaseController
 
     public function actionDokumente($id)
     {
-        $this->load_pdf_js = true;
         /** @var Dokument $dokument */
         $dokument = Dokument::getCachedByID($id);
         if (!$dokument) {
@@ -826,7 +821,7 @@ class IndexController extends RISBaseController
     {
         Header("Content-Type: application/json; charset=UTF-8");
         $shariff = new \Heise\Shariff\Backend([
-            "domain"   => $_SERVER["HTTP_HOST"],
+            "domains"   => [$_SERVER["HTTP_HOST"]],
             "services" => ["Facebook", "GooglePlus"],
             "cache"    => [
                 "ttl"      => 60,
@@ -839,6 +834,6 @@ class IndexController extends RISBaseController
 
     public function actionBaListe()
     {
-        $this->render('ba_liste', ["bas" => Bezirksausschuss::model()->findAll()]);
+        $this->render('ba_liste', ["bas" => Bezirksausschuss::model()->alleOhneStadtrat()]);
     }
 }
